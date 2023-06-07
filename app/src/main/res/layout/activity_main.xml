@@ -4,15 +4,78 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:background="@drawable/background_pattern">
 
-    <TextView
-        android:layout_width="wrap_content"
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_margin="16dp"
+        card_view:cardCornerRadius="82dp"
+        android:background="#80FFFFFF"
+        android:layout_marginTop="48dp"
+        app:cardElevation="8dp"
+        app:cardUseCompatPadding="true"
+        tools:ignore="MissingConstraints">
+
+        <LinearLayout
+            android:layout_width="344dp"
+            android:layout_height="613dp"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <ImageView
+                android:layout_width="238dp"
+                android:layout_height="167dp"
+                android:cropToPadding="false"
+                android:layout_marginStart="24dp"
+                android:layout_marginBottom="24dp"
+                android:layout_marginTop="16dp"
+                android:src="@drawable/icon" />
+
+            <EditText
+                android:id="@+id/editTextEmail"
+                android:layout_width="218dp"
+                android:layout_height="67dp"
+                android:layout_marginStart="32dp"
+                android:hint="Correo electrónico"
+                android:inputType="textEmailAddress"
+                android:padding="16dp"
+                android:textAlignment="center" />
+
+            <EditText
+                android:id="@+id/editTextPassword"
+                android:layout_width="218dp"
+                android:layout_height="67dp"
+                android:layout_marginStart="32dp"
+                android:padding="16dp"
+                android:hint="Contraseña"
+                android:inputType="textPassword"
+                android:textAlignment="center"/>
+
+            <TextView
+                android:id="@+id/textViewRegister"
+                android:layout_width="263dp"
+                android:layout_height="53dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginStart="8dp"
+                android:padding="16dp"
+                android:textAlignment="center"
+                android:text="¿No tienes cuenta? registrate aquí" />
+
+            <Button
+                android:id="@+id/buttonLogin"
+                android:layout_width="221dp"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#03A9F4"
+                android:layout_marginTop="68dp"
+                android:layout_marginStart="32dp"
+                android:padding="16dp"
+                android:text="Iniciar sesión"
+                android:textColor="@android:color/white" />
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
