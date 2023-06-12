@@ -18,7 +18,7 @@ public class LogSucess extends AppCompatActivity {
         sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
 
         String savedEmail = sharedPreferences.getString("email", "");
-        String savedPassword = sharedPreferences.getString("pass", "");
+        //String savedPassword = sharedPreferences.getString("pass", "");
 
         TextView tvInfo = (TextView) findViewById(R.id.userInfo);
         tvInfo.setText(savedEmail);
