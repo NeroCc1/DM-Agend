@@ -2,8 +2,10 @@ package com.example.dm_agenda;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.TextView;
 
 public class LogSucess extends AppCompatActivity {
@@ -20,8 +22,12 @@ public class LogSucess extends AppCompatActivity {
         String savedEmail = sharedPreferences.getString("email", "");
         //String savedPassword = sharedPreferences.getString("pass", "");
 
-        TextView tvInfo = (TextView) findViewById(R.id.userInfo);
-        tvInfo.setText(savedEmail);
+        //TextView tvInfo = (TextView) findViewById(R.id.userInfo);
+        //tvInfo.setText(savedEmail);
 
+    }
+    public void hometask(View view){
+        Intent intent = new Intent(this, homeTasks.class);
+        startActivity(intent);
     }
 }
