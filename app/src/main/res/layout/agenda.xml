@@ -27,6 +27,7 @@
         android:layout_height="wrap_content"
         android:clickable="true"
         android:onClick="hometask"
+        android:contentDescription="Botón flotante para aañdir un nuevo task."
 
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

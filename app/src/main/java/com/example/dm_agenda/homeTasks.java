@@ -60,7 +60,7 @@ public class homeTasks extends AppCompatActivity {
         ExperienciaEducativaTarea.setAdapter(adapter);
 
         // Define an array of items
-        String[] item = {"Urgemte", "Leve", "Minimo"};
+        String[] item = {"Urgente", "Leve", "Mínimo"};
 
         // Create an ArrayAdapter using the array and a default spinner layout
         ArrayAdapter<String> adapto = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, item);
