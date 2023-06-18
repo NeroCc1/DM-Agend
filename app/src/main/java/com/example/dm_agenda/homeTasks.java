@@ -1,21 +1,30 @@
 package com.example.dm_agenda;
 
+import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
+import android.media.Image;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.TimePicker;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.dm_agenda.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class homeTasks extends AppCompatActivity {
     TextView TituloTarea;
@@ -27,25 +36,19 @@ public class homeTasks extends AppCompatActivity {
     ImageButton GuardarTareaBtn;
 
     SharedPreferences shPreferences;
-    String currentUser;
 
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_guardar_tareas);
 
-        TituloTarea = findViewById(R.id.TituloTarea);
-        FechaTarea = findViewById(R.id.FechaTarea);
-        ExperienciaEducativaTarea = findViewById(R.id.EE);
-        AlarmaTarea = findViewById(R.id.Alarma);
-        DescripcionTarea = findViewById(R.id.Descripcion);
-        GuardarTareaBtn = findViewById(R.id.GuardarTareaBtn);
+        TituloTarea = (TextView) findViewById(R.id.TituloTarea);
+        FechaTarea = (TextView) findViewById(R.id.FechaTarea);
+        ExperienciaEducativaTarea = (Spinner) findViewById(R.id.EE);
+        AlarmaTarea = (Spinner) findViewById(R.id.Alarma);
+        DescripcionTarea = (EditText) findViewById(R.id.Descripcion);
+        GuardarTareaBtn = (ImageButton) findViewById(R.id.GuardarTareaBtn);
 
         shPreferences = getSharedPreferences("SavedData", MODE_PRIVATE);
-
-        // Obtener el usuario actual de las preferencias compartidas
-        SharedPreferences sharedPrefs = getSharedPreferences("MyPrefs", MODE_PRIVATE);
-        currentUser = sharedPrefs.getString("email", "");
 
         // Define an array of items
         String[] items = {"Algebra lineal", "Calculo diferencial", "Español"};
@@ -98,15 +101,18 @@ public class homeTasks extends AppCompatActivity {
                         String EEt = jsonObject.getString("ExperienciaEducativaTarea");
                         String ATr = jsonObject.getString("AlarmaTarea");
                         String DscT = jsonObject.getString("DescripcionTarea");
-                        // Add tarea object to the ArrayList if it belongs to the current user
-                        if (currentUser.equals(jsonObject.getString("Usuario"))) {
-                            tareas.add(new Tarea(tTare, fTare, EEt, ATr, DscT));
-                        }
+
+                        // Add tarea object to the ArrayList
+                        tareas.add(new Tarea(tTare, fTare, EEt, ATr, DscT));
                     }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
 
-                    // Create a new Tarea object with the input values and add it to the ArrayList
-                    tareas.add(new Tarea(Titulo, fecha, EE, Alarma, Descripcion));
+                // Create a new Tarea object with the input values and add it to the ArrayList
+                tareas.add(new Tarea(Titulo, fecha, EE, Alarma, Descripcion));
 
+                try {
                     // Create a new JSONArray and add JSON objects for each tarea in the ArrayList
                     JSONArray jsonArreglo = new JSONArray();
                     for (Tarea tarea : tareas) {
@@ -116,7 +122,6 @@ public class homeTasks extends AppCompatActivity {
                         jsonObject.put("ExperienciaEducativaTarea", tarea.getExperienciaEducativaTarea());
                         jsonObject.put("AlarmaTarea", tarea.getAlarmaTarea());
                         jsonObject.put("DescripcionTarea", tarea.getDescripcionTarea());
-                        jsonObject.put("Usuario", currentUser); // Add the current user to the JSON object
                         jsonArreglo.put(jsonObject);
                     }
 
@@ -135,5 +140,6 @@ public class homeTasks extends AppCompatActivity {
                 }
             }
         });
+
     }
 }
