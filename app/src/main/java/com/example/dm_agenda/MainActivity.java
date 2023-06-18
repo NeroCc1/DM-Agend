@@ -5,6 +5,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -15,8 +17,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
-
-    private SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,44 +29,45 @@ public class MainActivity extends AppCompatActivity {
         TextView tvRegister = findViewById(R.id.textViewRegister);
         Button btnLog = findViewById(R.id.buttonLogin);
 
-        //Inicialización de SharedPreferences.
-        sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
-
-        tvRegister.setOnClickListener(new View.OnClickListener() { //Intent al layout de registro.
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, PantallaRegistro.class);
-                startActivity(intent);
-            }
+        //Intent al layout de registro.
+        tvRegister.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, PantallaRegistro.class);
+            startActivity(intent);
         });
 
-        btnLog.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //Recuperar el texto almacenado en los textFields.
-                String email = etEmail.getText().toString().trim();
-                String pass = etPass.getText().toString().trim();
+        btnLog.setOnClickListener(v -> {
+            //Recuperación de la información en los textField.
+            String email = etEmail.getText().toString().trim();
+            String pass = etPass.getText().toString().trim();
 
-                //Verificación si alguno de los textFields(email o password) se encuentra vacío.
-                if (TextUtils.isEmpty(email) || TextUtils.isEmpty(pass)) {
-                    Toast.makeText(MainActivity.this, "Rellene toda la información", Toast.LENGTH_SHORT).show();
+            if (TextUtils.isEmpty(email) || TextUtils.isEmpty(pass)) { //Verificación de campos no vacíos.
+                Toast.makeText(MainActivity.this, "Rellene toda la información", Toast.LENGTH_SHORT).show();
+            } else {
+                //Se crean instancias de la BD para poder leer la información.
+                DatabaseHelper databaseHelper = new DatabaseHelper(MainActivity.this);
+                SQLiteDatabase db = databaseHelper.getReadableDatabase();
+//Se crea un arreglo que permite recuperar las columbas Email y Password de la BD.
+                String[] projection = {DatabaseHelper.COLUMN_EMAIL, DatabaseHelper.COLUMN_PASSWORD};
+//Se buscan coincidencias de valor '?' en las columnas EMAIL y PASSWORD de la BD esperando respuesta a remplazar..
+                String selection = DatabaseHelper.COLUMN_EMAIL + " = ? AND " + DatabaseHelper.COLUMN_PASSWORD + " = ?";
+//Valores que van a remplazar las columnas con valor '?'.
+                String[] selectionArgs = {email, pass};
+//Se ejecuta la consulta.
+                Cursor cursor = db.query(DatabaseHelper.TABLE_USERS, projection, selection, selectionArgs, null, null, null);
+
+                if (cursor.moveToFirst()) { //Verifica si hay resultados.
+                    // Las credenciales son correctas, redireccionar a la actividad de éxito de inicio de sesión
+                    Toast.makeText(MainActivity.this, "Login correcto.", Toast.LENGTH_SHORT).show();
+                    Intent LogSuc = new Intent(MainActivity.this, LogSucess.class);
+                    LogSuc.putExtra("email", email); //Se manda el valor del email al siguiente activity.
+                    startActivity(LogSuc);
                 } else {
-
-//Se recupera los valores almacenados en 'email' y 'pass' del objeto SharedPreferences realizado en activity de registro.
-                    String savedEmail = sharedPreferences.getString("email", "");
-                    String savedPassword = sharedPreferences.getString("pass", "");
-
-//Comparación si las cadenas guardadas en los textField de este activity son iguales a las cadenas almacenadas usando sharedPreferences.
-                    if (email.equals(savedEmail) && pass.equals(savedPassword)) {
-                        //En caso que sean iguales, muestra un Toast y redirecciona a otra activity de login.
-                        Toast.makeText(MainActivity.this, "Login correcto.", Toast.LENGTH_SHORT).show();
-                        Intent LogSuc = new Intent(MainActivity.this, LogSucess.class);
-                        startActivity(LogSuc);
-                    } else {
-                        //En caso contrario, un Toast que muestra el mensaje que los datos ingresados son incorrectos por no estar almacenados.
-                        Toast.makeText(MainActivity.this, "Datos incorrectos.", Toast.LENGTH_SHORT).show();
-                    }
+                    // Las credenciales son incorrectas
+                    Toast.makeText(MainActivity.this, "Datos incorrectos.", Toast.LENGTH_SHORT).show();
                 }
+//Se cierran conexiones.
+                cursor.close();
+                db.close();
             }
         });
     }
