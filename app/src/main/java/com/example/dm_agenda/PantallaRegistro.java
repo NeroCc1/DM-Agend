@@ -5,17 +5,17 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.ContentValues;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import com.example.dm_agenda.DB.DatabaseHelper;
 
 public class PantallaRegistro extends AppCompatActivity {
 //Declaración de elementos.
@@ -71,6 +71,11 @@ public class PantallaRegistro extends AppCompatActivity {
                 } else {
                     Toast.makeText(PantallaRegistro.this, "Error al registrar.", Toast.LENGTH_SHORT).show();
                 }
+                // Guardar el ID del usuario registrado en SharedPreferences
+                SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putLong("UserID", result); // Suponiendo que el ID del usuario es de tipo long
+                editor.apply();
             }
         });
     }

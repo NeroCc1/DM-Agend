@@ -24,22 +24,20 @@
         <activity
             android:name=".createTask"
             android:exported="true"
-            android:label="viewTareas">
+            android:label="registrar"
+            android:theme="@style/AppTheme.createTask">
+        </activity>
+
+        <activity
+            android:name=".homeTask"
+            android:exported="true"
+            android:label="vertareas">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <activity
-            android:name=".homeTasks"
-            android:exported="true"
-            android:label="RegistroTarea">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
 
         <activity
             android:name=".MainActivity"
@@ -49,7 +47,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
     </application>
 
 </manifest>

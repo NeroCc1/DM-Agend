@@ -26,9 +26,4 @@ public class LogSucess extends AppCompatActivity {
         String userEmail = getIntent().getStringExtra("email");
         tvInfo.setText(userEmail);
     }
-
-    public void hometask(View view){
-        Intent intent = new Intent(this, homeTasks.class);
-        startActivity(intent);
-    }
 }

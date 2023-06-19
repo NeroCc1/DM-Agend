@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">DM-Agenda</string>
+    <string-array name="ee_array">
+        <item>Programacion</item>
+        <item>Diseño</item>
+        <item>Seguridad</item>
+        <!-- Agrega más elementos según sea necesario -->
+    </string-array>
 </resources>

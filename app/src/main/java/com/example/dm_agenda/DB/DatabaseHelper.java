@@ -1,4 +1,4 @@
-package com.example.dm_agenda;
+package com.example.dm_agenda.DB;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;

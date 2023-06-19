@@ -1,84 +1,158 @@
 package com.example.dm_agenda;
 
+import android.app.AlarmManager;
+import android.app.DatePickerDialog;
+import android.app.PendingIntent;
+import android.app.TimePickerDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.DatePicker;
+import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.Spinner;
 import android.widget.TextView;
-
-// createTask.java
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.os.Bundle;
-import android.view.View;
-import android.widget.TextView;
+import android.widget.TimePicker;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonSyntaxException;
-import com.google.gson.reflect.TypeToken;
+import com.example.dm_agenda.DB.DBHelper;
 
-import java.lang.reflect.Type;
-import java.util.List;
-import java.util.Map;
+import java.util.Calendar;
 
 public class createTask extends AppCompatActivity {
-    TextView HmTxtTareas;
-    SharedPreferences shPreferences;
+    TextView textView;
+    ImageButton imgBtnExt;
+    ImageButton GuardarTareaBtn;
+    EditText Descripcion;
+    Spinner EE;
+    Button datePickerButton;
+    Button timePickerButton;
+    EditText TituloTarea;
 
-    @Override
+    DBHelper dbHelper;
+
+    private int selectedYear, selectedMonth, selectedDayOfMonth;
+    private int selectedHourOfDay, selectedMinute;
+
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.agenda);
+        setContentView(R.layout.activity_guardar_tareas);
 
-        FloatingActionButton fb = findViewById(R.id.fb);
-        fb.setOnClickListener(new View.OnClickListener() {
+        dbHelper = new DBHelper(this);
+
+        // Obtener el ID del usuario registrado desde SharedPreferences
+        SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+        long userID = sharedPreferences.getLong("UserID", -1); // Valor predeterminado -1 si no se encuentra el ID
+
+        textView = findViewById(R.id.textView);
+        imgBtnExt = findViewById(R.id.imgBtnExt);
+        GuardarTareaBtn = findViewById(R.id.GuardarTareaBtn);
+        Descripcion = findViewById(R.id.Descripcion);
+        EE = findViewById(R.id.EE);
+        datePickerButton = findViewById(R.id.datePickerButton);
+        timePickerButton = findViewById(R.id.timePickerButton);
+        TituloTarea = findViewById(R.id.TituloTarea);
+
+        // Set up the toolbar
+        //Toolbar toolbar = findViewById(R.id.GuardarTarea);
+
+        // Configure la ruleta para EE
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.ee_array, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        EE.setAdapter(adapter);
+
+        datePickerButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                // Crear un Intent para iniciar la nueva actividad
-                Intent intent = new Intent(createTask.this, homeTasks.class);
-                startActivity(intent);
+            public void onClick(View v) {
+                // Obtener la fecha actual
+                Calendar calendar = Calendar.getInstance();
+                int year = calendar.get(Calendar.YEAR);
+                int month = calendar.get(Calendar.MONTH);
+                int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
+
+                // Mostrar el diálogo de selección de fecha
+                DatePickerDialog datePickerDialog = new DatePickerDialog(createTask.this,
+                        new DatePickerDialog.OnDateSetListener() {
+                            @Override
+                            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                                selectedYear = year;
+                                selectedMonth = month;
+                                selectedDayOfMonth = dayOfMonth;
+                            }
+                        }, year, month, dayOfMonth);
+
+                // Mostrar el diálogo de selección de fecha
+                datePickerDialog.show();
             }
         });
 
-        shPreferences = getSharedPreferences("SavedData", MODE_PRIVATE);
-        HmTxtTareas = findViewById(R.id.HmTxtTareas);
+        timePickerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Obtener la hora actual
+                Calendar calendar = Calendar.getInstance();
+                int hourOfDay = calendar.get(Calendar.HOUR_OF_DAY);
+                int minute = calendar.get(Calendar.MINUTE);
 
-        String jsonString = shPreferences.getString("ArrayJSON", "");
+                // Mostrar el diálogo de selección de hora
+                TimePickerDialog timePickerDialog = new TimePickerDialog(createTask.this,
+                        new TimePickerDialog.OnTimeSetListener() {
+                            @Override
+                            public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                                selectedHourOfDay = hourOfDay;
+                                selectedMinute = minute;
+                            }
+                        }, hourOfDay, minute, false);
 
-        if (!jsonString.isEmpty()) {
-            try {
-                // Convierte la cadena JSON a una lista de objetos
-                Gson gson = new GsonBuilder().create();
-                Type tipoLista = new TypeToken<List<Map<String, Object>>>() {}.getType();
-                List<Map<String, Object>> listaObjetos = gson.fromJson(jsonString, tipoLista);
-
-                // Construye la cadena formateada
-                StringBuilder stringBuilder = new StringBuilder();
-                for (Map<String, Object> objeto : listaObjetos) {
-                    stringBuilder.append("- Titulo: ").append(objeto.get("TituloTarea"))
-                            .append(", Fecha: ").append(objeto.get("FechaTarea"))
-                            .append(", EE: ").append(objeto.get("ExperienciaEducativaTarea"))
-                            .append(", Alarma: ").append(objeto.get("AlarmaTarea"))
-                            .append(", Descripcion: ").append(objeto.get("DescripcionTarea"))
-                            .append("\n")
-                            .append("\n");
-                }
-
-                String listaFormateada = stringBuilder.toString();
-
-                // Muestra la cadena formateada en el TextView
-                HmTxtTareas.setText(listaFormateada);
-            } catch (JsonSyntaxException e) {
-                e.printStackTrace();
-                // Maneja cualquier error de análisis de JSON aquí
+                // Mostrar el diálogo de selección de hora
+                timePickerDialog.show();
             }
-        } else {
-            // Si el jsonString está vacío, puedes mostrar un mensaje alternativo o hacer algo más
-            HmTxtTareas.setText("No hay datos disponibles");
-        }
+        });
+
+
+        imgBtnExt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Implement your close activity logic here
+            }
+        });
+
+        GuardarTareaBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Obtener los valores de los campos de entrada
+                String Titulo = TituloTarea.getText().toString().trim();
+                String DescripcionTarea = Descripcion.getText().toString().trim();
+                String EESelected = EE.getSelectedItem().toString();
+
+                // Insertar la tarea en la base de datos con el ID del usuario registrado
+                long taskId = dbHelper.insertTask(userID, Titulo, DescripcionTarea, EESelected);
+
+
+                if (taskId != -1) {
+                    Toast.makeText(createTask.this, "Tarea guardada exitosamente", Toast.LENGTH_SHORT).show();
+
+                    // Configure la alarma usando AlarmManager
+                    AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+                    Intent intent = new Intent(createTask.this, AlarmReceiver.class);
+                    intent.putExtra("task_title", Titulo);
+                    PendingIntent pendingIntent = PendingIntent.getBroadcast(createTask.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+                    // Establecer la fecha y hora seleccionadas en el calendario
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.set(selectedYear, selectedMonth, selectedDayOfMonth, selectedHourOfDay, selectedMinute);
+                    alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
+                } else {
+                    Toast.makeText(createTask.this, "Error al guardar la tarea", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 }
