@@ -1,5 +1,6 @@
 package com.example.dm_agenda;
 
+import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.DatePickerDialog;
 import android.app.PendingIntent;
@@ -25,7 +26,6 @@ import androidx.appcompat.widget.Toolbar;
 import com.example.dm_agenda.DB.DBHelper;
 
 import java.util.Calendar;
-
 public class createTask extends AppCompatActivity {
     TextView textView;
     ImageButton imgBtnExt;
@@ -61,7 +61,7 @@ public class createTask extends AppCompatActivity {
         TituloTarea = findViewById(R.id.TituloTarea);
 
         // Set up the toolbar
-        //Toolbar toolbar = findViewById(R.id.GuardarTarea);
+        // Toolbar toolbar = findViewById(R.id.GuardarTarea);
 
         // Configure la ruleta para EE
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.ee_array, android.R.layout.simple_spinner_item);
@@ -149,10 +149,30 @@ public class createTask extends AppCompatActivity {
                     Calendar calendar = Calendar.getInstance();
                     calendar.set(selectedYear, selectedMonth, selectedDayOfMonth, selectedHourOfDay, selectedMinute);
                     alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
+
+                    // Actualizar la lista de tareas en homeTask
+                    loadTasks();
+
+                    // Finalizar la actividad createTask y volver a la actividad homeTask
+                    finish();
                 } else {
                     Toast.makeText(createTask.this, "Error al guardar la tarea", Toast.LENGTH_SHORT).show();
                 }
             }
         });
+    }
+
+    private void loadTasks() {
+        // Obtener el ID del usuario registrado desde SharedPreferences
+        SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+        long userID = sharedPreferences.getLong("UserID", -1); // Valor predeterminado -1 si no se encuentra el ID
+
+        // Obtener la instancia de la actividad homeTask (actividad padre)
+        Activity parentActivity = getParent();
+
+        if (parentActivity instanceof homeTask) {
+            // Actualizar la lista de tareas en la actividad homeTask
+            ((homeTask) parentActivity).refreshTasks();
+        }
     }
 }

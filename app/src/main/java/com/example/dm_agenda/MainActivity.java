@@ -1,8 +1,11 @@
 package com.example.dm_agenda;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -12,9 +15,16 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.dm_agenda.DB.DBHelper;
 import com.example.dm_agenda.DB.DatabaseHelper;
+import com.example.dm_agenda.entidades.Task;
+
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
+    DBHelper dbHelper;
+    private RecyclerView recyclerViewTasks;
+    private TaskAdapter taskAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
                 String[] selectionArgs = {email, pass};
 
                 //Se ejecuta la consulta.
-                Cursor cursor = db.query(DatabaseHelper.TABLE_USERS, projection, selection, selectionArgs, null, null, null);
+               // Cursor cursor = db.query(DatabaseHelper.TABLE_USERS, projection, selection, selectionArgs, null, null, null);
 
                 if (cursor.moveToFirst()) { //Verifica si hay resultados.
                     // Las credenciales son correctas, redireccionar a la actividad de éxito de inicio de sesión
@@ -60,14 +70,34 @@ public class MainActivity extends AppCompatActivity {
                     Intent LogSuc = new Intent(MainActivity.this, homeTask.class);
                     LogSuc.putExtra("email", email); //Se manda el valor del email al siguiente activity.
                     startActivity(LogSuc);
+
+                    refreshTasks(); // Llamada al método refreshTasks() después de iniciar sesión correctamente
                 } else {
                     // Las credenciales son incorrectas
                     Toast.makeText(MainActivity.this, "Datos incorrectos.", Toast.LENGTH_SHORT).show();
                 }
-//Se cierran conexiones.
+
+                //Se cierran conexiones.
                 cursor.close();
                 db.close();
             }
         });
     }
+
+    private void refreshTasks() {
+        // Obtener el ID del usuario registrado desde SharedPreferences
+        SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+        long userID = sharedPreferences.getLong("UserID", -1); // Valor predeterminado -1 si no se encuentra el ID
+
+        // Obtener las tareas del usuario actualizado
+        dbHelper = new DBHelper(MainActivity.this);
+        List<Task> taskList = dbHelper.getTasksByUserID(userID);
+
+        // Configurar el RecyclerView y el Adapter
+        recyclerViewTasks = findViewById(R.id.listaTareas);
+        recyclerViewTasks.setLayoutManager(new LinearLayoutManager(MainActivity.this));
+        taskAdapter = new TaskAdapter(MainActivity.this, taskList);
+        recyclerViewTasks.setAdapter(taskAdapter);
+    }
 }
+

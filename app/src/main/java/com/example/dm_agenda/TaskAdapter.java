@@ -1,6 +1,7 @@
 package com.example.dm_agenda;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,9 +18,14 @@ import java.util.List;
 public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder> {
     private Context context;
     private List<Task> taskList;
+    private OnItemClickListener listener;
+
 
     public TaskAdapter(Context context, List<Task> taskList) {
         this.context = context;
+        this.taskList = taskList;
+    }
+    public void setTaskList(List<Task> taskList) {
         this.taskList = taskList;
     }
 
@@ -31,13 +37,22 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
     }
 
     @Override
-    public void onBindViewHolder(@NonNull TaskViewHolder holder, int position) {
-        Task task = taskList.get(position);
-
+    public void onBindViewHolder(@NonNull TaskViewHolder holder, final int position) {
+        final Task task = taskList.get(position);
         holder.txtTitulo.setText(task.getTitle());
         holder.txtEE.setText(task.getEe());
-        holder.txtFecha.setText(task.getDate());
-        // Configurar otros datos de la tarea en los elementos de la vista
+
+        final int clickedPosition = position; // Crear una variable final y asignarle el valor de position
+
+        // Manejar el evento de clic en una tarea
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (listener != null) {
+                    listener.onItemClick(clickedPosition); // Utilizar la variable clickedPosition
+                }
+            }
+        });
     }
 
     @Override
@@ -60,5 +75,14 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
             txtFecha = itemView.findViewById(R.id.datePickerButton);
             // Inicializar otros elementos de la vista relacionados con la tarea
         }
+
     }
+    public interface OnItemClickListener {
+        void onItemClick(int position);
+    }
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        this.listener = listener;
+    }
+
+
 }
